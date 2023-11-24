@@ -190,6 +190,10 @@ function escrever_tabela(json_linhas_selecionadas){
             row_tab.innerText = json_linhas_selecionada.tabela;
             row_horario.innerText = json_linhas_selecionada.horario;
             row_f_linha.innerText = json_linhas_selecionada.final_linha;
+
+            row_f_linha.setAttribute('data-bs-toggle','popover');
+            row_f_linha.setAttribute('title','Minutos');
+            row_f_linha.setAttribute('data-bs-content',calcular_minutos(json_linhas_selecionada.horario,json_linhas_selecionada.final_linha));
         }
         else{
 
@@ -208,9 +212,14 @@ function escrever_tabela(json_linhas_selecionadas){
             row_tab.innerText = json_linhas_selecionada.tabela;
             row_horario.innerText = json_linhas_selecionada.horario;
             row_f_linha.innerText = json_linhas_selecionada.final_linha;
+
+            row_f_linha.setAttribute('data-bs-toggle','popover');
+            row_f_linha.setAttribute('title','Minutos');
+            row_f_linha.setAttribute('data-bs-content',calcular_minutos(json_linhas_selecionada.horario,json_linhas_selecionada.final_linha));
         }
 
     }
+    ativar_popovers();
     rolar_pagina();
 }
 
@@ -218,4 +227,36 @@ function rolar_pagina(){
     let rolar_para_linha = document.getElementsByClassName('table-secondary');
 
     window.scrollTo(0,(rolar_para_linha[rolar_para_linha.length-1].offsetTop));
+}
+
+ativar_popovers = () =>{
+    let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    let popoverList = popoverTriggerList.map(function(popoverTriggerEl){
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
+}
+
+calcular_minutos = (valor_primeiro_horario,valor_segundo_horario) =>{
+    let valores_primeiro = valor_primeiro_horario.split(':');
+    let valores_segundo = valor_segundo_horario.split(':');
+
+    let minutos_primeiro = parseInt((valores_primeiro[0]*60))+parseInt(valores_primeiro[1]);
+    let minutos_segundo = parseInt((valores_segundo[0]*60))+parseInt(valores_segundo[1]);
+
+    resultado = minutos_segundo-minutos_primeiro;
+
+    if(resultado<-800){
+        if(valores_segundo[0]=='00'){
+            minutos_segundo = (24*60)+parseInt(valores_segundo[1]);
+            resultado = minutos_segundo-minutos_primeiro;
+            return resultado;
+        }
+        else if(valores_segundo[0]=='01'){
+            minutos_segundo = (25*60)+parseInt(valores_segundo[1]);
+            resultado = minutos_segundo-minutos_primeiro;
+            return resultado;
+        }
+    }
+
+    return resultado;
 }
