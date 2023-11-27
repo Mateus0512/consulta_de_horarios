@@ -11,14 +11,30 @@ var todas_linhas = '';
 var linhas_selecionadas = [];
 var data = '';
 var hora = '';
+var tema_escuro = ver_tema() ?? false;
 var json_temporario = '';
 var json_linhas_selecionadas = [];
 var terminal = document.getElementById('terminal');
 var check_list = document.getElementById('check_list');
 var select_div = document.getElementById('select_div');
 var table_div = document.getElementById('table_div');
+var flexSwitchCheckDefault = document.getElementById('flexSwitchCheckDefault');
+var menu = document.getElementById('menu');
+var body = document.querySelector('body');
+var voltar_linhas = document.getElementById('voltar_linhas');
+var voltar_terminais = document.getElementById('voltar_terminais');
+var loader = document.getElementById('loader');
+
+
 
 async function consultar_linhas(){
+    if(tema_escuro=='true'){
+        funcao_tema_escuro();
+        flexSwitchCheckDefault.checked = true;
+    }else{
+        funcao_tema_claro();
+        flexSwitchCheckDefault.checked = false;
+    }
     try {
         request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/linhas/');
         if(request.ok){
@@ -65,17 +81,24 @@ terminal.addEventListener('change',function(){
     }
 
 function escrever_checklist(){
-    select_div.remove();
+    voltar_terminais.classList.remove('disabled');
+    select_div.style.display = 'none';
+    check_list.style.display = 'block';
     let session_checklist = document.createElement('session');
+    session_checklist.setAttribute('id','session-checklist');
     for(let linha_terminal of terminal_selecionado){
         session_checklist.innerHTML += `
         <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="`+linha_terminal.numero+`" value="`+linha_terminal.numero+`">
+        <input type="checkbox" class="form-check-input list-checkbox" id="`+linha_terminal.numero+`" value="`+linha_terminal.numero+`">
         <label for="`+linha_terminal.numero+`" class="form-check-label">`+linha_terminal.numeroNome+`</label>
         </div>
         `; 
     }
-    session_checklist.innerHTML += "<input type='button' id='consultar' class='btn btn-success' value='Consultar'>"
+    if(ver_tema()=='true'){
+        session_checklist.innerHTML += "<input type='button' id='consultar' class='btn btn-secondary' value='Consultar'>"
+    }else{
+        session_checklist.innerHTML += "<input type='button' id='consultar' class='btn btn-success' value='Consultar'>"
+    }
     check_list.appendChild(session_checklist);
     adicionar_event_botao();
 
@@ -85,10 +108,14 @@ function adicionar_event_botao(){
     let consultar = document.getElementById('consultar');
 
     consultar.addEventListener('click',function(){
-        let check_items = document.getElementsByClassName('form-check-input');
+        check_list.style.display = 'none';
+        ativar_loader();
+        let check_items = document.getElementsByClassName('list-checkbox');
         for(let check_item of check_items){
             if(check_item.checked == true){
-                linhas_selecionadas.push(check_item.value);
+                
+                    linhas_selecionadas.push(check_item.value);
+                
             }
         }
         console.log(linhas_selecionadas);
@@ -101,14 +128,20 @@ async function consultar_linhas_selecionadas(){
     
     for(let linha of linhas_selecionadas){
         dia_atual();
-        request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/programacao/'+linha+'?data='+data+'');
+        try {
+            request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/programacao/'+linha+'?data='+data+'');
         json_temporario = await request.json();
+        } catch (error) {
+            console.log(error);
+        }
+        
         
         organizar_json(json_temporario);
     }
 
 
     escrever_tabela(json_linhas_selecionadas);
+    desativar_loader();
 }
 
 dia_atual = () =>{
@@ -148,10 +181,14 @@ function organizar_json(json_temporario){
 
 
 function escrever_tabela(json_linhas_selecionadas){
-    check_list.remove();
+    voltar_linhas.classList.remove('disabled');
+    table_div.style.display = 'block';
+    
 
     let tabela = document.createElement('table');
     tabela.classList.add('table');
+    //tabela.classList.add('table-borderless');
+    tabela.classList.add('table-dark');
     tabela.setAttribute('id','tabela');
     table_div.appendChild(tabela);
     let th = tabela.insertRow();
@@ -169,7 +206,7 @@ function escrever_tabela(json_linhas_selecionadas){
     cabecalho_f_linha.innerText = 'F.Linha';
 
     th.classList.add('sticky-header');
-    th.classList.add('table-dark');
+    //th.classList.add('table-dark');
 
     for(let json_linhas_selecionada of json_linhas_selecionadas){
         console.log(json_linhas_selecionada.horario);
@@ -177,7 +214,11 @@ function escrever_tabela(json_linhas_selecionadas){
         if(json_linhas_selecionada.horario<hora){
             let tr = tabela.insertRow();
 
-            tr.classList.add('table-secondary');
+            //tr.classList.add('table-secondary');
+            tr.classList.add('marcado');
+            tr.classList.add('horarios');
+            
+            if(ver_tema()=='false'){tr.classList.add('table-secondary');}
 
             let row_linha = tr.insertCell();
             let row_emp = tr.insertCell();
@@ -189,17 +230,22 @@ function escrever_tabela(json_linhas_selecionadas){
             row_emp.innerText = json_linhas_selecionada.empresa;
             row_tab.innerText = json_linhas_selecionada.tabela;
             row_horario.innerText = json_linhas_selecionada.horario;
-            row_f_linha.innerText = json_linhas_selecionada.final_linha;
+            row_f_linha.innerHTML = json_linhas_selecionada.final_linha+`<svg xmlns="http://www.w3.org/2000/svg" style="color:green;" width="20" height="20" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+          </svg>`;
 
             row_f_linha.setAttribute('data-bs-toggle','popover');
             row_f_linha.setAttribute('title','Minutos');
             row_f_linha.setAttribute('data-bs-content',calcular_minutos(json_linhas_selecionada.horario,json_linhas_selecionada.final_linha));
+            row_f_linha.setAttribute('style','display:flex;justify-content:space-between;');
         }
         else{
 
             let tr = tabela.insertRow();
+            tr.classList.add('horarios');
 
-            tr.classList.add('table-primary');
+            //tr.classList.add('table-success');
+            if(ver_tema()=='false'){tr.classList.add('table-secondary');}
 
             let row_linha = tr.insertCell();
             let row_emp = tr.insertCell();
@@ -219,14 +265,22 @@ function escrever_tabela(json_linhas_selecionadas){
         }
 
     }
+    table_div.style.display = 'block';
     ativar_popovers();
     rolar_pagina();
 }
 
 function rolar_pagina(){
-    let rolar_para_linha = document.getElementsByClassName('table-secondary');
+    //let rolar_para_linha = document.getElementsByClassName('table-secondary');
+    let rolar_para_linha = document.getElementsByClassName('marcado');
 
-    window.scrollTo(0,(rolar_para_linha[rolar_para_linha.length-1].offsetTop));
+    try{
+        window.scrollTo(0,(rolar_para_linha[rolar_para_linha.length-1].offsetTop));
+    }
+    catch(error){
+        console.log(error);
+    }
+    
 }
 
 ativar_popovers = () =>{
@@ -259,4 +313,149 @@ calcular_minutos = (valor_primeiro_horario,valor_segundo_horario) =>{
     }
 
     return resultado;
+}
+
+function ver_tema(){
+    if(localStorage.getItem('dark_theme')==undefined){
+        localStorage.setItem('dark_theme',false);
+    }else{
+        let tema = localStorage.getItem('dark_theme');
+        return tema;
+    }
+    
+
+    
+}
+
+flexSwitchCheckDefault.addEventListener('change',function(){
+    trocar_tema();
+})
+
+function trocar_tema(){
+
+    
+    if(flexSwitchCheckDefault.checked){
+        localStorage.setItem('dark_theme',true);
+        funcao_tema_escuro();
+    }
+    else{
+        localStorage.setItem('dark_theme',false);
+        funcao_tema_claro();
+    }
+}
+
+function funcao_tema_escuro(){
+    menu.classList.remove('navbar-light');
+    menu.classList.remove('bg-light');
+
+    menu.classList.add('navbar-dark');
+    menu.classList.add('bg-dark');
+
+    body.style.backgroundColor = 'black';
+
+    check_list.classList.add('check_list_escuro');
+
+    if(document.getElementById('consultar')!=undefined){
+    document.getElementById('consultar').classList.remove('btn-success');
+    document.getElementById('consultar').classList.add('btn-secondary');
+    }
+
+    for(horario of table_div.getElementsByClassName('horarios')){
+        horario.classList.remove('table-secondary');
+    }
+
+}
+
+function funcao_tema_claro(){
+    menu.classList.remove('navbar-dark');
+    menu.classList.remove('bg-dark');
+
+    menu.classList.add('navbar-light');
+    menu.classList.add('bg-light');
+
+    body.style.backgroundColor = 'white';
+
+    check_list.classList.remove('check_list_escuro');
+
+    if(document.getElementById('consultar')!=undefined){
+    document.getElementById('consultar').classList.remove('btn-secondary');
+    document.getElementById('consultar').classList.add('btn-success');
+    }
+
+    for(horario of table_div.getElementsByClassName('horarios')){
+        horario.classList.add('table-secondary');
+    }
+}
+
+function voltar_para_linhas(){
+    voltar_linhas.classList.add('disabled');
+    table_div.style.display = 'none';
+    check_list.style.display = 'block';
+    document.getElementById('tabela').remove();
+    json_temporario = [];
+    json_linhas_selecionadas = [];
+    linhas_selecionadas = [];
+}
+
+voltar_linhas.addEventListener('click',voltar_para_linhas);
+
+function voltar_para_terminais(){
+    voltar_terminais.classList.add('disabled');
+    voltar_linhas.classList.add('disabled');
+    json_temporario = [];
+    json_linhas_selecionadas = [];
+    linhas_selecionadas = [];
+    if(window.getComputedStyle(check_list).display == 'block'){
+        check_list.style.display = 'none';
+        select_div.style.display = 'block';
+
+        document.getElementById('session-checklist').remove();
+    }else if(window.getComputedStyle(table_div).display == 'block'){
+        
+        voltar_terminais.classList.add('disabled');
+        check_list.style.display = 'none';
+        table_div.style.display = 'none';
+        document.getElementById('session-checklist').remove();
+        document.getElementById('tabela').remove();
+        select_div.style.display = 'block';
+    }
+
+
+}
+
+voltar_terminais.addEventListener('click',voltar_para_terminais);
+
+function ativar_loader(){
+    loader.style.display = 'flex';
+    loader.innerHTML = '<div class="lds-ring"><div id="loading"></div><div></div><div></div><div></div></div>';
+    if(ver_tema()=='false'){
+        document.getElementById('loading').setAttribute('style',`    box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border: 8px solid #000;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: #000 transparent transparent transparent;`);
+    }else{
+        document.getElementById('loading').setAttribute('style',`    box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border: 8px solid #fff;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: #fff transparent transparent transparent;`);
+    }
+    
+}
+
+function desativar_loader(){
+    loader.innerHTML = '';
+    loader.style.display = 'none';
+    
 }
