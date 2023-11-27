@@ -166,7 +166,20 @@ function organizar_json(json_temporario){
         for(let tabela=0;tabela<json_temporario.quadro.tabelas.length;tabela++){
             for(let trecho=0;trecho<json_temporario.quadro.tabelas[tabela].trechos.length;trecho++){
 
+                let array_terminal_selecionado = nome_terminal_selecionado.split('Terminal');
+                let array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.split('Terminal');
+
+                //console.log('array_terminal_selecionado :'+array_terminal_selecionado);
+                //console.log('array_postoControle :'+array_postoControle);
+
+                //array_terminal_selecionado = nome_terminal_selecionado.split(' ');
+                //array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.split(' ');
+                
+
                 if(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle==nome_terminal_selecionado){
+                    json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
+                }
+                else if(comparar_posto(array_terminal_selecionado,array_postoControle)==true){
                     json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
                 }
                    
@@ -469,4 +482,31 @@ function desativar_loader(){
     loader.style.display = 'none';
     
 }
+
+function comparar_posto(array_terminal_selecionado,array_postoControle){
+    let lista_postos = ['Antônio','Bezerra','Conjunto','Ceará','Lagoa','Messejana','Papicu','Parangaba','Siqueira'];
+
+    let separacao1 = array_postoControle[1].split(' ');
+    let separacao2 = array_terminal_selecionado[1].split(' ');
+
+
+        for(let sep1 of separacao1){
+            for(let sep2 of separacao2){
+                if(sep1.length>0&&sep2.length>0){
+                    if(sep1==sep2){
+                        for(let posto of lista_postos){
+                            if(sep1==posto){
+                                return true;
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+
+
+   
+    }
 
