@@ -39,7 +39,7 @@ async function consultar_linhas(){
         request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/linhas/');
         if(request.ok){
             todas_linhas =  await request.json();
-            console.log(todas_linhas);
+            //console.log(todas_linhas);
             terminal.disabled = false;
         }else{
             throw new Error("Requisição Falhou: "+ request.status);
@@ -64,7 +64,7 @@ terminal.addEventListener('change',function(){
             nome_terminal_selecionado = option.textContent;
         }
     }
-    console.log(nome_terminal_selecionado);
+    //console.log(nome_terminal_selecionado);
     selecionar_terminal(todas_linhas,terminal.value);
     escrever_checklist();
 });
@@ -118,7 +118,7 @@ function adicionar_event_botao(){
                 
             }
         }
-        console.log(linhas_selecionadas);
+        //console.log(linhas_selecionadas);
         consultar_linhas_selecionadas();
     });
 }
@@ -130,12 +130,15 @@ async function consultar_linhas_selecionadas(){
         dia_atual();
         try {
             request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/programacao/'+linha+'?data='+data+'');
-        json_temporario = await request.json();
+            json_temporario = await request.json();
+            if(json_temporario.Message){
+                throw new Error("Programação não encontrada: "+ json_temporario.Message)
+            }
         } catch (error) {
             console.log(error);
         }
         
-        
+        //console.log(json_temporario);
         organizar_json(json_temporario);
     }
 
@@ -157,17 +160,23 @@ dia_atual = () =>{
 
 function organizar_json(json_temporario){
 
-    
+    if(json_temporario.Message){
 
+    }else{
         for(let tabela=0;tabela<json_temporario.quadro.tabelas.length;tabela++){
             for(let trecho=0;trecho<json_temporario.quadro.tabelas[tabela].trechos.length;trecho++){
 
-                if(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle==nome_terminal_selecionado){
+                if(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle==nome_terminal_selecionado||json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.includes(nome_terminal_selecionado)!=-1){
                     json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
                 }
                 
             }//trecho
         }// tabela
+    }
+
+    
+
+        
       
         json_linhas_selecionadas = json_linhas_selecionadas.sort((a,b)=>{
             if(a.horario<b.horario){
@@ -209,8 +218,8 @@ function escrever_tabela(json_linhas_selecionadas){
     //th.classList.add('table-dark');
 
     for(let json_linhas_selecionada of json_linhas_selecionadas){
-        console.log(json_linhas_selecionada.horario);
-        console.log(hora);
+        //console.log(json_linhas_selecionada.horario);
+        //console.log(hora);
         if(json_linhas_selecionada.horario<hora){
             let tr = tabela.insertRow();
 
