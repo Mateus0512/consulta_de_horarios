@@ -166,8 +166,8 @@ function organizar_json(json_temporario){
         for(let tabela=0;tabela<json_temporario.quadro.tabelas.length;tabela++){
             for(let trecho=0;trecho<json_temporario.quadro.tabelas[tabela].trechos.length;trecho++){
 
-                let array_terminal_selecionado = nome_terminal_selecionado.split('Terminal');
-                let array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.split('Terminal');
+                let array_terminal_selecionado = nome_terminal_selecionado;
+                let array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle;
 
                 //console.log('array_terminal_selecionado :'+array_terminal_selecionado);
                 //console.log('array_postoControle :'+array_postoControle);
@@ -411,6 +411,7 @@ function funcao_tema_claro(){
 }
 
 function voltar_para_linhas(){
+    limpar_popovers();
     voltar_linhas.classList.add('disabled');
     table_div.style.display = 'none';
     check_list.style.display = 'block';
@@ -423,6 +424,7 @@ function voltar_para_linhas(){
 voltar_linhas.addEventListener('click',voltar_para_linhas);
 
 function voltar_para_terminais(){
+    limpar_popovers();
     voltar_terminais.classList.add('disabled');
     voltar_linhas.classList.add('disabled');
     json_temporario = [];
@@ -442,7 +444,7 @@ function voltar_para_terminais(){
         document.getElementById('tabela').remove();
         select_div.style.display = 'block';
     }
-
+    
 
 }
 
@@ -486,9 +488,8 @@ function desativar_loader(){
 function comparar_posto(array_terminal_selecionado,array_postoControle){
     let lista_postos = ['Antônio','Bezerra','Conjunto','Ceará','Lagoa','Messejana','Papicu','Parangaba','Siqueira'];
 
-    let separacao1 = array_postoControle[1].split(' ');
-    let separacao2 = array_terminal_selecionado[1].split(' ');
-
+    let separacao1 = array_postoControle.split(' ');
+    let separacao2 = array_terminal_selecionado.split(' ');
 
         for(let sep1 of separacao1){
             for(let sep2 of separacao2){
@@ -504,9 +505,12 @@ function comparar_posto(array_terminal_selecionado,array_postoControle){
                 }
             }
         }
+}
 
-
-
-   
+function limpar_popovers(){
+    let popovers = document.getElementsByClassName('popover');
+    while(document.getElementsByClassName('popover').length>0){
+        popovers[0].remove();
     }
+}
 
