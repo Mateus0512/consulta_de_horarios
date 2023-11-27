@@ -77,7 +77,7 @@ terminal.addEventListener('change',function(){
                 }
             }
         }
-        console.log(terminal_selecionado);
+        //console.log(terminal_selecionado);
     }
 
 function escrever_checklist(){
@@ -166,9 +166,10 @@ function organizar_json(json_temporario){
         for(let tabela=0;tabela<json_temporario.quadro.tabelas.length;tabela++){
             for(let trecho=0;trecho<json_temporario.quadro.tabelas[tabela].trechos.length;trecho++){
 
-                if(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle==nome_terminal_selecionado||json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.includes(nome_terminal_selecionado)!=-1){
+                if(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle==nome_terminal_selecionado){
                     json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
                 }
+                   
                 
             }//trecho
         }// tabela
@@ -468,3 +469,4 @@ function desativar_loader(){
     loader.style.display = 'none';
     
 }
+
