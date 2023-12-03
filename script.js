@@ -514,3 +514,12 @@ function limpar_popovers(){
     }
 }
 
+window.addEventListener('scroll',function(){
+    let posicao = window.scrollY || document.documentElement.scrollTop;
+    let tabela = document.getElementById("tabela");
+    if(tabela!=undefined){
+        let head = document.getElementsByClassName('sticky-header')[0];
+        let tamanho_menu = menu.offsetHeight;
+        head.style.cssText = "top:"+tamanho_menu+"px;position:sticky;transition:1;";
+    }
+});
