@@ -27,7 +27,7 @@ input[type=checkbox]:checked+label {
 
 .sticky-header{
     position: sticky;
-    top: 0;
+    
 }
 .check_list_escuro{
 color: white;
@@ -85,3 +85,7 @@ color: white;
     background: rgba(0, 0, 0, 0.5);
     
   }
+.menu{
+    position: sticky;
+    top:0;
+}
