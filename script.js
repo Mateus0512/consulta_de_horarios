@@ -40,7 +40,7 @@ async function consultar_linhas(){
         if(request.ok){
             todas_linhas =  await request.json();
             //console.log(todas_linhas);
-            
+            terminal.disabled = false;
         }else{
             throw new Error("Requisição Falhou: "+ request.status);
         }
