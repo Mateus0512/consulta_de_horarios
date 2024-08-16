@@ -36,11 +36,11 @@ async function consultar_linhas(){
         flexSwitchCheckDefault.checked = false;
     }
     try {
-        request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/linhas/');
+        request = await fetch('https://api-lyart-chi.vercel.app/linhas/');
         if(request.ok){
             todas_linhas =  await request.json();
             //console.log(todas_linhas);
-            terminal.disabled = false;
+            
         }else{
             throw new Error("Requisição Falhou: "+ request.status);
         }
@@ -129,7 +129,7 @@ async function consultar_linhas_selecionadas(){
     for(let linha of linhas_selecionadas){
         dia_atual();
         try {
-            request = await fetch('http://gistapis.etufor.ce.gov.br:8081/api/programacao/'+linha+'?data='+data+'');
+            request = await fetch('https://api-lyart-chi.vercel.app/ProgramacaoNormal/'+linha+'?data='+data+'');
             json_temporario = await request.json();
             if(json_temporario.Message){
                 throw new Error("Programação não encontrada: "+ json_temporario.Message)
