@@ -1,10 +1,12 @@
-var messejana = [4,26,51,52,53,55,56,68,82,84,1203,315,328,600,613,614,616,617,618,619,620,621,622,626,628,629,630,631,632,634,635,636,637,639,640,641,642,643,644,645,646,647,648,650,652,653,655,656,657,662,663,665,667,668,681,682,685,686,697,699,815,1815]
-var siqueira = [27,30,49,50,51,52,55,56,63,65,73,78,84,87,97,99,1355,300,325,326,329,330,332,334,335,336,337,338,342,345,346,355,360,361,362,366,370,376,378,380,381,382,383,384,386,388,392,393,397,398,400];
-var papicu = [4,16,21,27,28,30,31,32,34,35,36,38,41,42,44,45,48,50,51,52,53,54,55,56,66,68,69,76,86,87,89,92,96,98,222,627,680,804,806,810,813,814,815,820,823,825,831,832,835,840,841,860,901,903,913,920,1815];
-var lagoa = [25,34,35,36,40,43,67,69,83,85,304,308,322,323,332,350,356,358,364,394,411,421];
-var antorio_bezerra = [15,24,26,28,34,35,42,51,52,55,56,57,58,59,71,72,74,79,81,82,86,88,91,92,97,120,122,130,172,200,205,206,210,211,212,213,214,215,216,217,220,222,225,244,389,855,1074];
-var conjunto_ceara = [15,36,43,45,76,81,83,96,1204,1385,322,327,345,357,367,368,385];
-var parangaba = [29,38,40,41,44,48,60,63,66,70,72,77,80,89,91,95,1390,172,244,301,306,307,309,311,312,313,315,317,319,321,328,339,340,344,347,349,352,353,359,361,362,369,371,372,373,375,377,379,390,391,395,396,399,401,403,456,466,513];
+var messejana = [4,26,51,52,53,55,56,68,82,84,315,328,600,613,614,616,617,618,619,620,621,622,626,628,629,630,631,632,634,635,636,637,639,640,641,642,643,644,645,646,647,648,650,652,653,655,656,657,662,663,665,667,668,681,682,685,686,697,699,815,1203,1815]
+var siqueira = [27,30,49,50,51,52,55,56,63,65,73,78,84,87,97,99,300,325,326,329,330,332,334,335,336,337,338,342,345,346,355,360,361,362,366,370,376,378,380,381,382,383,384,386,388,392,393,397,398,400,1310,1355];
+var papicu = [4,16,21,27,28,30,31,32,34,35,36,38,41,42,44,45,48,50,51,52,53,55,56,66,68,69,76,86,87,89,92,96,222,627,680,804,806,810,813,814,815,820,823,825,831,832,835,840,841,860,901,903,913,920,1815];
+var lagoa = [25,34,35,36,40,43,67,69,85,304,308,322,323,332,350,356,358,394,411,421,1211,1212];
+var antorio_bezerra = [15,24,26,28,34,35,42,51,52,55,56,57,58,71,72,74,79,81,82,86,88,91,92,97,120,122,130,172,200,205,206,210,211,212,213,214,215,216,217,220,222,225,244,389,855,1074];
+var conjunto_ceara = [15,36,43,45,76,81,83,96,322,327,345,357,367,368,385,1385];
+var parangaba = [29,38,40,41,44,48,60,63,66,70,72,77,80,89,91,95,172,244,301,306,307,309,311,312,313,315,317,319,321,328,339,340,344,347,349,352,353,359,361,362,369,371,372,373,375,377,379,390,391,395,396,399,401,403,456,466,513,1210,1320,1390];
+var coracao_jesus = [22,501,600,601,602,603,604,609,610,611,612,613,633,649,650,660,666,701,702,816];
+var jose_alencar = [11,12,14,57,111,112,114,115,200,220,303,305,308,310,314,316,331,333,350,360,371,374,385,387,389,401,403,404,405,406,407,411,421,502,605,606,665,670,901,906];
 var terminal_selecionado = [];
 var nome_terminal_selecionado = '';
 var todas_linhas = '';
@@ -128,6 +130,7 @@ async function consultar_linhas_selecionadas(){
     
     for(let linha of linhas_selecionadas){
         dia_atual();
+        
         try {
             request = await fetch('https://api-lyart-chi.vercel.app/ProgramacaoNormal/'+linha+'?data='+data+'');
             json_temporario = await request.json();
@@ -169,14 +172,7 @@ function organizar_json(json_temporario){
                 let array_terminal_selecionado = nome_terminal_selecionado;
                 let array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle;
 
-                //console.log('array_terminal_selecionado :'+array_terminal_selecionado);
-                //console.log('array_postoControle :'+array_postoControle);
-
-                //array_terminal_selecionado = nome_terminal_selecionado.split(' ');
-                //array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.split(' ');
-                
-
-                if(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle==nome_terminal_selecionado){
+                if(nome_terminal_selecionado.toLowerCase().includes(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.toLowerCase())){
                     json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
                 }
                 else if(comparar_posto(array_terminal_selecionado,array_postoControle)==true){
