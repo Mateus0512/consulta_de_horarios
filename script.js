@@ -56,10 +56,8 @@ async function consultar_linhas(){
     
     
 }
-consultar_linhas();
 
 terminal.addEventListener('change',function(){
-    terminal_selecionado = [];
     let options = terminal.getElementsByTagName('option');
     for(let option of options){
         if(option.selected==true){
@@ -67,9 +65,64 @@ terminal.addEventListener('change',function(){
         }
     }
     //console.log(nome_terminal_selecionado);
-    selecionar_terminal(todas_linhas,terminal.value);
-    escrever_checklist();
+    //selecionar_terminal(todas_linhas,terminal.value);
+    const posto = nome_terminal_selecionado.split("-")[0];
+    //console.log(posto)
+    linhasDoPostoSelecionado(posto.trim());
+    
 });
+
+async function linhasDoPostoSelecionado(posto) {
+    try {
+        const responseLinhasDoPosto = await fetch(`https://api-lyart-chi.vercel.app/linhasDoPosto/${posto}`);
+        const resultLinhasDoPosto = await responseLinhasDoPosto.json();
+        //console.log(resultLinhasDoPosto);
+        if(resultLinhasDoPosto.length>0){
+            terminal_selecionado = resultLinhasDoPosto;
+            escrever_checklist();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+async function consultarPostos() {
+    try {
+        const response = await fetch("https://api-lyart-chi.vercel.app/postoControle/");
+        const result = await response.json();
+        if(result.length>0){
+            terminal.disabled = false;
+            for(let posto of result){
+                terminal.innerHTML += `
+                
+                <option>
+                    ${posto.numero} - ${posto.nome}
+                </option>`;
+            } 
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+consultarPostos();
+//consultar_linhas();
+
+// terminal.addEventListener('change',function(){
+//     terminal_selecionado = [];
+//     let options = terminal.getElementsByTagName('option');
+//     for(let option of options){
+//         if(option.selected==true){
+//             nome_terminal_selecionado = option.textContent;
+//         }
+//     }
+//     //console.log(nome_terminal_selecionado);
+//     selecionar_terminal(todas_linhas,terminal.value);
+//     escrever_checklist();
+// });
+
+
 
     function selecionar_terminal(todas_linhas,opcao){
         for(linha of window[opcao]){
@@ -173,10 +226,10 @@ function organizar_json(json_temporario){
                 let array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle;
 
                 if(nome_terminal_selecionado.toLowerCase().includes(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.toLowerCase())){
-                    json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
+                    json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length-3),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length-3)});
                 }
                 else if(comparar_posto(array_terminal_selecionado,array_postoControle)==true){
-                    json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length)});
+                    json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length-3),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length-3)});
                 }
                    
                 
