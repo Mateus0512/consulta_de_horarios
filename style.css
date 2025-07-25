@@ -5,7 +5,7 @@ html{
 
 body{
     
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     
 }
@@ -22,7 +22,7 @@ input[type=checkbox]:checked+label {
 }
 #consultar{
     width: 90%;
-    margin: 10px 10px;
+    margin: 10px 10px 30px 10px;
 }
 
 .sticky-header{

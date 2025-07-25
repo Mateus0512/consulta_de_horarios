@@ -189,6 +189,12 @@ function adicionar_event_botao(){
 
 
 async function consultar_linhas_selecionadas(){
+    if(linhas_selecionadas.length<1){
+        alert("Selecione pelo menos uma linha");
+        check_list.style.display = 'block';
+        desativar_loader();
+        return;
+    }
     
     for(let linha of linhas_selecionadas){
         dia_atual();
