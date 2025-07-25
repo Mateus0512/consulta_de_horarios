@@ -66,17 +66,18 @@ terminal.addEventListener('change',function(){
     }
     //console.log(nome_terminal_selecionado);
     //selecionar_terminal(todas_linhas,terminal.value);
-    const posto = nome_terminal_selecionado.split("-")[0];
+    const posto = nome_terminal_selecionado.trim();
     //console.log(posto)
-    linhasDoPostoSelecionado(posto.trim());
+    linhasDoPostoSelecionado(posto);
     
 });
 
 async function linhasDoPostoSelecionado(posto) {
     try {
-        const responseLinhasDoPosto = await fetch(`https://api-lyart-chi.vercel.app/linhasDoPosto/${posto}`);
+        //const responseLinhasDoPosto = await fetch(`http://localhost:3333/linhasDoPosto/${posto}`);
+        const url = `https://api-lyart-chi.vercel.app/linhasDoPosto/${encodeURIComponent(posto.trim())}`;
+        const responseLinhasDoPosto = await fetch(url);
         const resultLinhasDoPosto = await responseLinhasDoPosto.json();
-        //console.log(resultLinhasDoPosto);
         if(resultLinhasDoPosto.length>0){
             terminal_selecionado = resultLinhasDoPosto;
             escrever_checklist();
@@ -89,7 +90,15 @@ async function linhasDoPostoSelecionado(posto) {
 
 async function consultarPostos() {
     try {
-        const response = await fetch("https://api-lyart-chi.vercel.app/postoControle/");
+        if(tema_escuro=='true'){
+            funcao_tema_escuro();
+            flexSwitchCheckDefault.checked = true;
+        }else{
+            funcao_tema_claro();
+            flexSwitchCheckDefault.checked = false;
+        }
+        //const response = await fetch("http://localhost:3333/postos/");
+        const response = await fetch("https://api-lyart-chi.vercel.app/postos/");
         const result = await response.json();
         if(result.length>0){
             terminal.disabled = false;
@@ -97,7 +106,7 @@ async function consultarPostos() {
                 terminal.innerHTML += `
                 
                 <option>
-                    ${posto.numero} - ${posto.nome}
+                    ${posto}
                 </option>`;
             } 
         }
@@ -187,6 +196,7 @@ async function consultar_linhas_selecionadas(){
         try {
             request = await fetch('https://api-lyart-chi.vercel.app/ProgramacaoNormal/'+linha+'?data='+data+'');
             json_temporario = await request.json();
+            //console.log(json_temporario);
             if(json_temporario.Message){
                 throw new Error("Programação não encontrada: "+ json_temporario.Message)
             }
@@ -225,7 +235,7 @@ function organizar_json(json_temporario){
                 let array_terminal_selecionado = nome_terminal_selecionado;
                 let array_postoControle = json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle;
 
-                if(nome_terminal_selecionado.toLowerCase().includes(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.toLowerCase())){
+                if(nome_terminal_selecionado.toLowerCase().includes(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.postoControle.toLowerCase().trim())){
                     json_linhas_selecionadas.push({'linha':json_temporario.codigoLinha,'empresa':json_temporario.quadro.tabelas[tabela].trechos[trecho].empresa,'tabela':json_temporario.quadro.tabelas[tabela].numero+' '+json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.descricao.slice(0,1),'horario':json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].inicio.horario.length-3),'final_linha':json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.slice(json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.indexOf('T')+1,json_temporario.quadro.tabelas[tabela].trechos[trecho].fim.horario.length-3)});
                 }
                 else if(comparar_posto(array_terminal_selecionado,array_postoControle)==true){
